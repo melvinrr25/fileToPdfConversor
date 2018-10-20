@@ -1,0 +1,19 @@
+{
+  "name": "pdf-converter-api",
+  "version": "1.0.0",
+  "description": "Api that converts files to base64 data",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "connect-timeout": "^1.9.0",
+    "cors": "2.8.4",
+    "express": "4.16.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "melvinrr25@gmail.com",
+  "license": "ISC"
+}
