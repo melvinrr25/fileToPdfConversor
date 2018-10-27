@@ -12,6 +12,9 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.post('/pdfconv', pdfConversorHandler);
+app.get('/apistatus', function(req, res){
+   res.status(200).json({status: 'running'});
+});
 app.get('/', function(req, res){
   res.sendStatus(200);
 });
