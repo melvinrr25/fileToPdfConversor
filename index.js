@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({
 
 app.post('/pdfconv', pdfConversorHandler);
 app.get('/apistatus', function(req, res){
-   res.status(200).json({status: 'running'});
+   res.status(200).json({status: 'running on aws ec2!!'});
 });
 app.get('/', function(req, res){
   res.sendStatus(200);
