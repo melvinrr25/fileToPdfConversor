@@ -1,6 +1,7 @@
 const https = require('https');
 const fs = require('fs');
 const exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
 const API_KEY = process.env.API_KEY;
 
 // The endpoint receives an URL to a file
@@ -9,7 +10,7 @@ const API_KEY = process.env.API_KEY;
 // Unoconv will convert the file into a PDF file and then the server will
 // convert that file into a base64 and send that as a response to the client.
 
-function unlinkFile(err) {}
+function handleError(err) {}
 
 function processFile(url, maxFileSize, callback) {
   maxFileSize = parseFloat(maxFileSize).toFixed(2);
@@ -30,10 +31,10 @@ function processFile(url, maxFileSize, callback) {
         // Convert file size to MB
         const fileInMB = parseFloat(
           parseFloat(file.bytesWritten) / 1000000
-        ).toFixed(2);
+          ).toFixed(2);
 
         if (parseFloat(fileInMB) > parseFloat(maxFileSize)) {
-          fs.unlink(file.path, unlinkFile);
+          fs.unlink(file.path, handleError);
           return callback('File is too big to preview');
         }
 
@@ -47,7 +48,7 @@ function processFile(url, maxFileSize, callback) {
       if (err) {
         return callback(err);
       }
-      fs.unlink(fileName, unlinkFile);
+      fs.unlink(fileName, handleError);
       callback(file.path);
     });
 
@@ -57,23 +58,41 @@ function processFile(url, maxFileSize, callback) {
 }
 
 function unoconvExecute(path, response) {
-  exec('unoconv -f pdf "' + path + '"', function onExecCommand(err) {
-    if (err) {
-      fs.unlink(path, unlinkFile);
-      return response.status(500).json({
-        message: JSON.stringify(err) + ' - user:' + response.user + ' - doc:' + response.document
-      });
-    }
+  const limitTime = 30000;
+  var timeout = null;
 
+  const killProc = "ps aux | grep -i office | awk {'print $2'} | xargs kill -9";
+
+  const proc = spawn('unoconv', ['-f', 'pdf', path]);
+
+  timeout = setTimeout(function() {
+    proc.kill();
+    exec(killProc, function(err) {})
+  }, limitTime);
+
+  proc.stderr.on('data', function(data) {
+    exec(killProc, function(err) {})
+  });
+
+  proc.on('exit', function() {
+    // Remove timeout from executing
+    clearTimeout(timeout);
     fs.readFile(path + '.pdf', null, function onReadFile(err, data) {
+      if (err) {
+        fs.unlink(path, handleError);
+        return response.status(500).json({
+          message: JSON.stringify(err) + ' - user:' + response.user + ' - doc:' + response.document
+        });
+      }
+
       const responseObject = {
         message: 'OK',
         data: data.toString('base64')
       };
       // Remove temp file downloaded
-      fs.unlink(path, unlinkFile);
+      fs.unlink(path, handleError);
       // Remove pdf file
-      fs.unlink(path + '.pdf', unlinkFile);
+      fs.unlink(path + '.pdf', handleError);
       return response.json(responseObject);
     });
   });
@@ -88,8 +107,8 @@ function pdfConversorHandler(request, response) {
 
   const url = request.body.url;
   let maxFileSize = parseFloat(request.body.maxFileSize || 1);
-  response.document = request.body.document; 
-  response.user = request.body.user; 
+  response.document = request.body.document;
+  response.user = request.body.user;
 
   if (isNaN(maxFileSize)) {
     maxFileSize = 1;
@@ -104,7 +123,7 @@ function pdfConversorHandler(request, response) {
   processFile(url, maxFileSize, function onProcessFile(err, path) {
     if (err) {
       const msg = {
-        message: JSON.stringify(err) + ' - user:' + response.user + ' - doc:' + response.document 
+        message: JSON.stringify(err) + ' - user:' + response.user + ' - doc:' + response.document
       };
       return response.status(500).json(msg);
     }
