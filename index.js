@@ -12,9 +12,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.post('/pdfconv', pdfConversorHandler);
-app.get('/apistatus', function(req, res){
-   res.status(200).json({status: 'running on aws ec2!!'});
-});
+
 app.get('/', function(req, res){
   res.sendStatus(200);
 });
@@ -27,24 +25,15 @@ function onError(error) {
   var fs = require('fs');
 
   if (error.syscall !== 'listen') {
-    fs.writeFile('listen-' + String(Date()) + '.tmp', '', function(err) {
-      if (err) throw err;
-    });
     throw error;
   }
 
   switch (error.code) {
     case 'EACCES':
-      fs.writeFile('EACCESS-' + String(Date()) + '.tmp', '', function(err) {
-        if (err) throw err;
-      });
       process.exit(1);
       break;
 
     case 'EADDRINUSE':
-      fs.writeFile('EACCESS-' + String(Date()) + '.tmp', '', function(err) {
-        if (err) throw err;
-      });
       process.exit(1);
       break;
 
