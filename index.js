@@ -18,6 +18,10 @@ app.get('/', function(req, res){
   res.sendStatus(200);
 });
 
+app.get('/test', function(req, res){
+  res.json({name: 'test'});
+});
+
 app.get('*', function(req, res){
   res.sendStatus(404);
 });
