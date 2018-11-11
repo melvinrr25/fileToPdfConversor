@@ -1,4 +1,3 @@
-// Author: Melvin Rodriguez
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -19,7 +18,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/test', function(req, res){
-  res.json({name: 'Melvin'});
+  res.json({author: 'Melvin(Developer)'});
 });
 
 app.get('*', function(req, res){
