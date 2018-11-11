@@ -18,7 +18,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/test', function(req, res){
-  res.json({author: 'melvinrr25@gmail.com || Melvin Rodriguez || Testing'});
+  res.json({author: 'melvinrr25@gmail.com'});
 });
 
 app.get('*', function(req, res){
