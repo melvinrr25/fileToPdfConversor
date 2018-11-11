@@ -19,7 +19,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/test', function(req, res){
-  res.json({name: 'test'});
+  res.json({name: 'Melvin'});
 });
 
 app.get('*', function(req, res){
