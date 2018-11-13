@@ -18,7 +18,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/test', function(req, res){
-  res.json({author: 'Melvin Rodriguez 2018'});
+  res.json({author: 'Melvin Rodriguez -> Developer'});
 });
 
 app.get('*', function(req, res){
